@@ -6,6 +6,7 @@ import http from 'http';
 import cors from 'cors';
 import { typeDefs, resolvers } from '../src/schemas/courseSchema.js'
 
+
 interface MyContext {
   token?: string;
 }
