@@ -66,8 +66,12 @@ export const resolvers = {
     }
   },
   Mutation: {
-    addCourse: async (_: any, { title, description, duration, outcome }: { title: string, description: string, duration: number, outcome: string[] }) => {
+    addCourse: async (_: any, { title, description, duration, outcome }: { title: string, description: string, duration: number, outcome: string[] }, context: any) => {
       try {
+        if (!context.user) {
+          throw new Error('Authentication required')
+        }
+
         const result = await pool.query(
           'INSERT INTO courses (title, description, duration, outcome) VALUES ($1, $2, $3, $4) RETURNING *',
           [title, description, duration, outcome]
@@ -76,6 +80,9 @@ export const resolvers = {
         return result.rows[0];
       } catch (error) {
         console.error(error);
+        if (error.message === 'Authentication required') {
+          throw new Error('Authentication required');
+        }
         throw new Error('Error creating course');
       }
     },

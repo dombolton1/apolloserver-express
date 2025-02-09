@@ -4,23 +4,14 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import express, { RequestHandler } from 'express';
 import http from 'http';
 import cors from 'cors';
-import { typeDefs, resolvers } from '../src/schemas/courseSchema.js'
+import { typeDefs, resolvers } from '../src/schemas/index.js';
+import jwt from 'jsonwebtoken';
 
+const JWT_SECRET = 'securepassword';
 
 interface MyContext {
   token?: string;
 }
-// const typeDefs = `#graphql
-//   type Query {
-//     hello: String
-//   }
-// `;
-
-// const resolvers = {
-//   Query: {
-//     hello: () => 'world',
-//   },
-// };
 
 // Required logic for integrating with Express
 const app = express();
@@ -49,7 +40,20 @@ app.use(
   // an Apollo Server instance and optional configuration options
 
   expressMiddleware(server, {
-    context: async ({ req }) => ({ token: req.headers.token }),
+    context: async ({ req }) => {
+      const token = req.headers.authorization || '';
+      let user = null;
+
+      if (token) {
+        try {
+          const decode = jwt.verify(token, JWT_SECRET);
+          user = decode;
+        } catch (error) {
+          console.error('Invalid token', error);
+        }
+      }
+      return { user };
+    },
   }) as unknown as RequestHandler,
 );
 

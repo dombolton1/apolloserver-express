@@ -5,6 +5,15 @@ export const typeDefs = gql`
   type Collection {
     id: ID!
     name: String!
+    courses: [Course!]!
+  }
+
+  type Course {
+    id: ID!
+    title: String!
+    description: String
+    duration: Float!
+    outcome: [String]
   }
 
   type Query {
@@ -21,13 +30,22 @@ export const resolvers = {
   Query: {
     getCollectionById: async (_: any, { id }: { id: string }) => {
       try {
-        const result = await pool.query('SELECT * FROM collections WHERE id = $1', [id]);
+        const collectionResult = await pool.query('SELECT * FROM collections WHERE id = $1', [id])
 
-        if (result.rows.length === 0) {
-          throw new Error('Collection not found');
+        if (collectionResult.rows.length === 0) {
+          throw new Error('Unable to find collection')
         }
 
-        return result.rows[0];
+        const collection = collectionResult.rows[0];
+        const courseResult = await pool.query(
+          'SELECT courses.* FROM courses JOIN course_collections ON courses.id = course_collections.course_id WHERE course_collections.collections_id = $1',
+          [id]
+        );
+        return {
+          id: collection.id,
+          name: collection.name,
+          courses: courseResult.rows,
+        };
       } catch (error) {
         console.error(error);
         throw new Error('Unable to find collection by ID')
