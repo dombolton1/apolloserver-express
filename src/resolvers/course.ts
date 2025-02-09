@@ -30,7 +30,10 @@ export const resolvers = {
         if (sortingOrder !== "ASC" && sortingOrder !== "DESC") {
           throw new Error("Invalid sorting order. ASC or DESC")
         }
-        const result: QueryResult<Course> = await pool.query(`SELECT * FROM courses ORDER BY id ${sortingOrder} LIMIT $1`, [limit]);
+        const result: QueryResult<Course> = await pool.query(
+          `SELECT * FROM courses ORDER BY id ${sortingOrder} LIMIT $1`,
+          [limit]
+        );
         return result.rows;
 
       } catch (error) {

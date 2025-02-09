@@ -7,8 +7,9 @@ import cors from 'cors';
 import { typeDefs } from '../src/schemas/index.js';
 import { resolvers } from '../src/resolvers/index.js';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-const JWT_SECRET = 'securepassword';
+dotenv.config();
 
 interface MyContext {
   token?: string;
@@ -21,6 +22,7 @@ const httpServer = http.createServer(app);
 const server = new ApolloServer<MyContext>({
   typeDefs,
   resolvers,
+  cache: 'bounded',
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 
@@ -37,8 +39,9 @@ app.use(
 
       if (token) {
         try {
-          const decode = jwt.verify(token, JWT_SECRET);
+          const decode = jwt.verify(token, process.env.JWT_SECRET);
           user = decode;
+          console.log(user)
         } catch (error) {
           console.error('Invalid token', error);
         }

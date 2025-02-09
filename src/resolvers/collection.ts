@@ -11,7 +11,10 @@ export const resolvers = {
       { id }: { id: string }
     ): Promise<CollectionWithCourses> => {
       try {
-        const collectionResult: QueryResult<Collection> = await pool.query('SELECT * FROM collections WHERE id = $1', [id]);
+        const collectionResult: QueryResult<Collection> = await pool.query(
+          'SELECT * FROM collections WHERE id = $1',
+          [id]
+        );
 
         if (collectionResult.rows.length === 0) {
           throw new Error('Unable to find collection')
@@ -52,7 +55,10 @@ export const resolvers = {
       name: { name: string }
     ): Promise<Collection> => {
       try {
-        const result: QueryResult<Collection> = await pool.query('INSERT INTO collections (name) VALUES ($1) RETURNING *', [name]);
+        const result: QueryResult<Collection> = await pool.query(
+          'INSERT INTO collections (name) VALUES ($1) RETURNING *',
+          [name]
+        );
         return result.rows[0];
       } catch (error) {
         console.error(error);
