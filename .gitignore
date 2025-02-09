@@ -5,4 +5,3 @@ dist/
 build/
 *.tsbuildinfo
 .vscode/
-src/database.ts
